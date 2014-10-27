@@ -198,7 +198,6 @@ class Collection extends Fieldset
         // Can't do anything with empty data
         if (empty($data)) {
             $this->shouldCreateChildrenOnPrepareElement = false;
-            return;
         }
 
         if (!$this->allowRemove && count($data) < $this->count) {
@@ -226,6 +225,12 @@ class Collection extends Fieldset
             } else {
                 $elementOrFieldset->setAttribute('value', $value);
             }
+        }
+
+        foreach (array_keys($this->byName) as $name) {
+            if (isset($data[$name]) === false) {
+                    $this->remove($name);
+                }
         }
 
         if (!$this->createNewObjects()) {
@@ -496,7 +501,7 @@ class Collection extends Fieldset
         foreach ($this->object as $key => $value) {
             if ($this->hydrator) {
                 $values[$key] = $this->hydrator->extract($value);
-            } elseif ($value instanceof $this->targetElement->object) {
+            } /* elseif ($value instanceof $this->targetElement->object) {
                 // @see https://github.com/zendframework/zf2/pull/2848
                 $targetElement = clone $this->targetElement;
                 $targetElement->object = $value;
@@ -507,7 +512,10 @@ class Collection extends Fieldset
                         $fieldset->setObject($value);
                     }
                 }
-            }
+            }*/
+                else {
+                        $values[$key] = $value;
+                }
         }
 
         foreach ($values as $name => $object) {
@@ -521,7 +529,7 @@ class Collection extends Fieldset
                     $childName = $childFieldset->getName();
                     if (isset($object[$childName])) {
                         $childObject = $object[$childName];
-                        if ($childFieldset->allowObjectBinding($childObject)) {
+                        if (is_object($childObject) && $childFieldset->allowObjectBinding($childObject)) {
                             $childFieldset->setObject($childObject);
                             $values[$name][$childName] = $childFieldset->extract();
                         }

@@ -151,7 +151,7 @@ class PhoneNumber extends AbstractValidator
      */
     public function setCountry($country)
     {
-        $this->country = strtoupper($country);
+        $this->country = $country;
 
         return $this;
     }
@@ -164,6 +164,8 @@ class PhoneNumber extends AbstractValidator
      */
     protected function loadPattern($code)
     {
+        $code = strToUpper($code);
+
         if (!isset(static::$phone[$code])) {
             if (!preg_match('/^[A-Z]{2}$/D', $code)) {
                 return false;
